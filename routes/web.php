@@ -12,7 +12,23 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+//rutas de prueba
 Route::get('/', function () {
     return view('welcome');
 });
+/*
+Segunda forma de ingresar a una vista
+  Route::get('/{ruta}', function ($ruta) {
+    return view($ruta);
+    }); 
+*/
+//Rutas del API
+
+Route::get('/usuario/','UserController@index');
+Route::get('/categoria/','CategoryController@index');
+Route::get('/posteo/','PostController@index');
+
+//Rutas del usuario
+Route::post('api/register','UserController@register');
+Route::post('api/login','UserController@login');
+Route::put('api/user/update','UserController@update');
