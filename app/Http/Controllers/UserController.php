@@ -32,7 +32,6 @@ class UserController extends Controller
 
             if($validate->fails()){
                 $message_error = $validate->errors();
-
                 $data = array(
                     'status' =>'error',
                     'code' => '404',
@@ -59,7 +58,6 @@ class UserController extends Controller
                     'message' => 'El usuario se ha creado correctamente',
                     'user' => $user
                 );
-
             }
 
         }else{
@@ -69,11 +67,6 @@ class UserController extends Controller
                 'message' => 'Los datos enviados no son correctos'
             );
         }
-        
-        
-
-
-
         return \response()->json($data,$data['code']);
     }
 
