@@ -29,13 +29,23 @@ Route::get('/usuario/','UserController@index');
 Route::get('/categoria/','CategoryController@index');
 Route::get('/posteo/','PostController@index');
 
-//Rutas del usuario
+//Rutas de registro y acceso
+//Creacion de Usuario
 Route::post('api/register','UserController@register');
+//Logeo del Usuario
 Route::post('api/login','UserController@login');
-Route::put('api/user/update','UserController@update');
-Route::post('api/user/upload','UserController@upload')->middleware('api.auth');
-Route::get('/api/user/avatar/{filename}','UserController@getImage');
-Route::get('api/user/detail/{user}','UserController@detail');
+
+//Rutas del usuario
+Route::group(['prefix'=>'/api/user/'],function(){
+  //Editar Usuario
+  Route::put('update','UserController@update');
+  //Guardar Imagen
+  Route::post('upload','UserController@upload')->middleware('api.auth');
+  //Mostrar Imagen
+  Route::get('avatar/{filename}','UserController@getImage');
+  //Mostrar Datos de Usuario
+  Route::get('detail/{user}','UserController@detail');
+});
 
 //Rutas del categorias
 Route::resource('/api/category','CategoryController');
