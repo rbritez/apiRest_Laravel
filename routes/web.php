@@ -29,13 +29,21 @@ Route::get('/usuario/','UserController@index');
 Route::get('/categoria/','CategoryController@index');
 Route::get('/posteo/','PostController@index');
 
-//Rutas de registro y acceso
+/*
+ * -----------------------------------------------------------
+ *                  Rutas de registro y acceso
+ * -----------------------------------------------------------
+ */
 //Creacion de Usuario
 Route::post('api/register','UserController@register');
 //Logeo del Usuario
 Route::post('api/login','UserController@login');
 
-//Rutas del usuario
+/*
+ * -----------------------------------------------------------
+ *                  Rutas del Usuario
+ * -----------------------------------------------------------
+ */
 Route::group(['prefix'=>'/api/user/'],function(){
   //Editar Usuario
   Route::put('update','UserController@update');
@@ -47,5 +55,9 @@ Route::group(['prefix'=>'/api/user/'],function(){
   Route::get('detail/{user}','UserController@detail');
 });
 
-//Rutas del categorias
+/*
+ * -----------------------------------------------------------
+ *                  Rutas de la Categoría
+ * -----------------------------------------------------------
+ */
 Route::resource('/api/category','CategoryController');
