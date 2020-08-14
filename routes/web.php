@@ -38,3 +38,4 @@ Route::get('/api/user/avatar/{filename}','UserController@getImage');
 Route::get('api/user/detail/{user}','UserController@detail');
 
 //Rutas del categorias
+Route::resource('/api/category','CategoryController');
