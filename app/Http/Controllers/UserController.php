@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\User;
 
 class UserController extends Controller
@@ -11,6 +12,11 @@ class UserController extends Controller
         return "Estas en el Index de usuario";
     }
 
+    /**
+     * -----------------------------------------------------------------------------
+     *                                Registrar Usuario
+     * -----------------------------------------------------------------------------
+    */
     public function register(Request $request){
         
         //obtenemos los datos del usuario
@@ -70,6 +76,11 @@ class UserController extends Controller
         return \response()->json($data,$data['code']);
     }
 
+    /**
+     * -----------------------------------------------------------------------------
+     *                                  Loguear Usuario
+     * -----------------------------------------------------------------------------
+    */
     public function login(Request $request){
         //recibiendo el post
         $json = $request->input('json',null);
@@ -102,6 +113,12 @@ class UserController extends Controller
         }
 
     }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     *                                Actualizar Usuario
+     * -----------------------------------------------------------------------------
+    */
     public function update(Request $request){
         //Actualizamos el usuario
         $token = $request->header('authorization');
@@ -140,10 +157,93 @@ class UserController extends Controller
                 );
         }else{
             $data = array(
-                'code'=>400,
-                'status'=>'error',
-                'message' =>'El usuario no esta identificado.'
+                'code'      => 400,
+                'status'    => 'error',
+                'message'   => 'El usuario no esta identificado.'
             );
+        }
+        return response()->json($data,$data['code']);
+    }
+
+    /**
+     * -----------------------------------------------------------------------------
+     *                           Recuperar datos del usuario
+     * -----------------------------------------------------------------------------
+    */
+    public function detail ($id){
+        $user = User::find($id);
+        
+        if(is_object($user)){
+            $data = [
+                'code' => 200,
+                'status' => 'success',
+                'user' => $user
+            ];
+        }else{
+            $data = [
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'El usuario no existe.' 
+            ];
+        }
+        return response()->json($data, $data['code']);
+    }
+
+    /**
+     * -----------------------------------------------------------------------------
+     *                                  Guardar Imagen
+     * -----------------------------------------------------------------------------
+    */
+    public function upload(Request $request){
+        //recoger datos de la peticion
+        $image = $request->file('file0');
+        //Validacion de Imagen
+        $validate = \Validator::make($request->all(),[
+            'file0' => 'required|image|mimes:jpg,jpeg,png'
+        ]);
+        //guardar imagen
+        if(!$image || $validate->fails()){
+
+            $data = [
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'No se ha podido subir la imagen',
+            ];
+        }else{
+
+            $image_name = time().$image->getClientOriginalName();
+            \Storage::disk('users')->put($image_name,\File::get($image));
+
+            $data = [
+                'code' => 200,
+                'status' => 'success',
+                'image' => $image_name,
+            ];
+        }
+        return response()->json($data,$data['code']);
+    }
+
+    /**
+     * -----------------------------------------------------------------------------
+     *                                  Recuperar Imagen
+     * -----------------------------------------------------------------------------
+    */
+    public function getImage($filename){
+        //verificar si el archivo existe
+        $isset = \Storage::disk('users')->exists($filename); 
+
+        //envio el archivo
+        if($isset){
+            $file = \Storage::disk('users')->get($filename);
+          
+            return new Response($file,200);
+        }else{
+            $data = [
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'La imagen no existe',
+            ];
+            
         }
         return response()->json($data,$data['code']);
     }
