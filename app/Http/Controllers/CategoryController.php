@@ -7,11 +7,11 @@ use Illuminate\Http\Response;
 use App\Category;
 class CategoryController extends Controller
 {
-    
+
     public function __construct(){
         $this->middleware('api.auth',['except' => ['index','show']]);
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -58,13 +58,13 @@ class CategoryController extends Controller
         $jsonCategory = $request->input('json');
         $params = \json_decode($jsonCategory); //objeto
         $params_array = \json_decode($jsonCategory,true); //array
-            
+
             //Limpiar espacios
             $params_array = array_map('trim',$params_array);
-            
+
             //Validamos los datos
             $validate = \Validator::make($params_array,[
-                'name'      => 'required|alpha',
+                'name'      => 'required',
             ]);
 
             if($validate->fails()){
@@ -79,7 +79,7 @@ class CategoryController extends Controller
             }else{
                  //creo la categoria
                 $category = Category::create($params_array);
-                
+
                 $data = array(
                     'status' =>'success',
                     'code' => '200',
@@ -89,7 +89,7 @@ class CategoryController extends Controller
             }
             //devuelto resultado
             return response()->json($data,$data['code']);
-        
+
     }
 
     /**
@@ -99,10 +99,10 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {   
+    {
         //busco la categoria a mostrar
         $category = Category::find($id);
-        
+
         //valido la categoria a mostrar
         if(is_object($category)){
             //la categoria existe
@@ -116,7 +116,7 @@ class CategoryController extends Controller
             $data = [
                 'code' => 404,
                 'status' => 'error',
-                'message' => 'La categoria no existe.' 
+                'message' => 'La categoria no existe.'
             ];
         }
         return response()->json($data, $data['code']);
@@ -148,7 +148,7 @@ class CategoryController extends Controller
         $params_array = \json_decode($jsonCategory,true); //array
 
         if(!empty($params_array) && !empty($params)){
-            //Valido los datos 
+            //Valido los datos
             $validate = \Validator::make($params_array,[
                 'name' => 'required|alpha'
             ]);
@@ -200,7 +200,7 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {   
+    {
         //valido el id de categoria
         if(!$id){
             $data = [
@@ -216,12 +216,12 @@ class CategoryController extends Controller
                     'code' => 400,
                     'status' => 'error',
                     'message' => 'La categoria seleccionada no existe'
-                ];  
+                ];
                 return response()->json($data,$data['code']);
             }
             //elimino la categoria
             $category = Category::destroy($id);
-            
+
             $data = [
                 'code' => 200,
                 'status' => 'success',
