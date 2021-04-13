@@ -48,10 +48,17 @@ class JwtAuth{
                     $data = $decoded;
                 }
             }else{
-                $data = array(
-                    'status' => 'error',
-                    'message' => 'Login Incorrecto'
-                );
+                if($user){
+                    $data = array(
+                        'status' => 'error',
+                        'message' => 'Contraseña Ingresada Incorrecta'
+                    );
+                }else{
+                    $data = array(
+                        'status' => 'error',
+                        'message' => 'El Email ingresado no pertenece a ningun usuario registrado'
+                    );
+                }
             }
 
         return $data;
@@ -71,12 +78,12 @@ class JwtAuth{
         }else{
             $auth = false;
         }
-        //combrobar si llega el flag -> getIdentity devolver el token 
+        //combrobar si llega el flag -> getIdentity devolver el token
         if($getIdentity){
             return $decoded;
         }
         return $auth;
-       
+
     }
 
 }
