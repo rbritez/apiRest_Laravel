@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JwtAuth;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use App\User;
 
 class UserController extends Controller
@@ -18,7 +22,7 @@ class UserController extends Controller
      * -----------------------------------------------------------------------------
     */
     public function register(Request $request){
-        
+
         //obtenemos los datos del usuario
         $json = $request->input('json', null);
         $params = \json_decode($json); //crea un objeto
@@ -27,9 +31,9 @@ class UserController extends Controller
         if(!empty($params_array) && !empty($params)){
             //Limpiar espacios
             $params_array = array_map('trim',$params_array);
-            
+
             //validamos datos
-            $validate = \Validator::make($params_array,[
+            $validate = Validator::make($params_array,[
                 'name'      => 'required|alpha',
                 'surname'   => 'required|alpha',
                 'email'     => 'required|email|unique:users',
@@ -45,7 +49,7 @@ class UserController extends Controller
                     'errors' => $message_error
                 );
             }else{
-                
+
                 //ciframos de contraseña
                 $pass_hash = \password_hash($params->password,PASSWORD_BCRYPT,['cost'=> 4]);
 
@@ -88,7 +92,7 @@ class UserController extends Controller
         $params_array = \json_decode($json,true);
 
         //validar datos
-        $validate = \Validator::make($params_array,[
+        $validate = Validator::make($params_array,[
             'email'     => 'required|email',
             'password'  => 'required'
         ]);
@@ -104,7 +108,7 @@ class UserController extends Controller
             return \response()->json($data,$data['code']);
         }else{
             //devolver datos con token
-            $jwtAuth = new \JwtAuth();
+            $jwtAuth = new JwtAuth();
             $singup = $jwtAuth->singup($params->email,$params->password);
             if(isset($params->gettoken) && !empty($params->gettoken)){
                 $singup = $jwtAuth->singup($params->email,$params->password,true);
@@ -113,16 +117,17 @@ class UserController extends Controller
         }
 
     }
-    
+
     /**
      * -----------------------------------------------------------------------------
      *                                Actualizar Usuario
      * -----------------------------------------------------------------------------
     */
     public function update(Request $request){
+
         //Actualizamos el usuario
         $token = $request->header('authorization');
-        $jwtAuth = new \JwtAuth();
+        $jwtAuth = new JwtAuth();
         $checkToken = $jwtAuth->checkToken($token);
 
         //Recogemos datos por post del usuario
@@ -130,11 +135,10 @@ class UserController extends Controller
         $params = \json_decode($json);
         $params_array = \json_decode($json,true);
         if($checkToken && !empty($params_array)){
-          
             //obtener datos del usuario identificado
             $user = $jwtAuth->checkToken($token,true);
             //validamos datos
-            $validate = \Validator::make($params_array,[
+            $validate = Validator::make($params_array,[
                 'name'      => 'required|alpha',
                 'surname'   => 'required|alpha',
                 'email'     => 'required|email|unique:users'.$user->sub,
@@ -172,7 +176,7 @@ class UserController extends Controller
     */
     public function detail ($id){
         $user = User::find($id);
-        
+
         if(is_object($user)){
             $data = [
                 'code' => 200,
@@ -183,7 +187,7 @@ class UserController extends Controller
             $data = [
                 'code' => 404,
                 'status' => 'error',
-                'message' => 'El usuario no existe.' 
+                'message' => 'El usuario no existe.'
             ];
         }
         return response()->json($data, $data['code']);
@@ -198,7 +202,7 @@ class UserController extends Controller
         //recoger datos de la peticion
         $image = $request->file('file0');
         //Validacion de Imagen
-        $validate = \Validator::make($request->all(),[
+        $validate = Validator::make($request->all(),[
             'file0' => 'required|image|mimes:jpg,jpeg,png'
         ]);
         //guardar imagen
@@ -212,7 +216,7 @@ class UserController extends Controller
         }else{
 
             $image_name = time().$image->getClientOriginalName();
-            \Storage::disk('users')->put($image_name,\File::get($image));
+            Storage::disk('users')->put($image_name,File::get($image));
 
             $data = [
                 'code' => 200,
@@ -230,12 +234,12 @@ class UserController extends Controller
     */
     public function getImage($filename){
         //verificar si el archivo existe
-        $isset = \Storage::disk('users')->exists($filename); 
+        $isset = Storage::disk('users')->exists($filename);
 
         //envio el archivo
         if($isset){
-            $file = \Storage::disk('users')->get($filename);
-          
+            $file = Storage::disk('users')->get($filename);
+
             return new Response($file,200);
         }else{
             $data = [
@@ -243,7 +247,7 @@ class UserController extends Controller
                 'status' => 'error',
                 'message' => 'La imagen no existe',
             ];
-            
+
         }
         return response()->json($data,$data['code']);
     }

@@ -21,7 +21,7 @@ Route::get('/', function () {
 Segunda forma de ingresar a una vista
   Route::get('/{ruta}', function ($ruta) {
     return view($ruta);
-    }); 
+    });
 */
 //Rutas del API
 

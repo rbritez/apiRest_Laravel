@@ -17,3 +17,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+/*
+ * -----------------------------------------------------------
+ *                  Rutas de Posteo
+ * -----------------------------------------------------------
+ */
+  //Guardar Imagen
+  Route::post('post/upload','PostController@upload')->middleware('api.auth');
+  //Mostrar Imagen
+  Route::get('post/image/{filename}','PostController@getImage');
